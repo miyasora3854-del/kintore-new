@@ -1085,7 +1085,7 @@ function renderMealAnalysis(){
 function renderBodyAnalysis(){
  const ps=photoRecords(currentUserId),dirs=['正面','背面','左側面','右側面'];
  let h=`<div class="photo-stats">`;
- dirs.forEach(o=>{let a=ps.filter(p=>p.orientation===o),old=a.length?a[0].date:'—';h+=`<div class="photo-stat"><span>${o}</span><b>${a.length}枚</b><div class="note">最も古い日付：${old}</div></div>`});h+='</div>';
+ dirs.forEach(o=>{let a=ps.filter(p=>p.orientation===o),old=a.length?a[0].date:'—';h+=`<div class="photo-stat"><span>${o}</span><b>${a.length}枚</b><div class="note">開始日：${old}</div></div>`});h+='</div>';
  h+=`<div class="card"><h3 style="margin:4px 0 10px">身体写真モーフィング</h3><div class="note">同じ方向の写真を日付順に並べ、シークバーで変化を確認できます。再生速度も変更できます。</div>`;
  h+=`<div class="row" style="margin-top:10px"><div style="flex:1"><label>方向</label><select id="morphOrientation" onchange="morphOrientationChanged()">${dirs.map(o=>`<option ${analysisState.morphOrientation===o?'selected':''}>${o}</option>`).join('')}</select></div><button id="morphPlay" onclick="toggleMorphPlay()">▶️ 再生</button></div><div class="morph-box" style="margin-top:10px"><canvas id="morphCanvas" class="morph-canvas"></canvas><input id="morphSeek" class="range-wide" type="range" min="0" max="1000" value="${analysisState.morphPos||0}" oninput="morphSeekChanged(this.value)"><div class="row" style="justify-content:space-between"><span id="morphLabel" class="note"></span><label style="margin:0">速度 <select id="morphSpeed" onchange="morphSpeedChanged()"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label></div></div></div>`;
  if(ps.length)h+=`<div class="card"><h3 style="margin:4px 0 10px">写真記録</h3><div class="note">最古：${ps[0].date} ／ 最新：${ps[ps.length-1].date} ／ 合計 ${ps.length}枚</div></div>`;else h+=`<div class="empty">身体写真がまだありません</div>`;
@@ -1653,9 +1653,9 @@ render();
   }
   function renderBody(){
     const ps=photoRecords(currentUserId),dirs=['正面','背面','左側面','右側面'];let h=`<div class="analysis-v10-photo-grid">`;
-    dirs.forEach(o=>{const a=ps.filter(p=>p.orientation===o),old=a.length?a[0].date:'—';h+=`<div class="analysis-v10-photo-stat"><span>${o}</span><b>${a.length}枚</b><div class="note">最も古い日付：${old}</div></div>`});h+=`</div>`;
+    dirs.forEach(o=>{const a=ps.filter(p=>p.orientation===o),old=a.length?a[0].date:'—';h+=`<div class="analysis-v10-photo-stat"><span>${o}</span><b>${a.length}枚</b><div class="note">開始日：${old}</div></div>`});h+=`</div>`;
     h+=`<div class="analysis-v10-card"><h3>身体写真モーフィング</h3><div class="row"><div style="flex:1"><label>方向</label><select id="a10orient">${dirs.map(o=>`<option ${A.orientation===o?'selected':''}>${o}</option>`).join('')}</select></div><button id="a10play">▶️ 再生</button></div><div style="margin-top:10px;background:#f7f7f8;padding:10px;border-radius:12px"><canvas id="a10morph" style="width:100%;height:300px;display:block;background:#ddd;border-radius:10px"></canvas><input id="a10seek" class="analysis-v10-range" type="range" min="0" max="1000" value="${A.pos}"><div class="row" style="justify-content:space-between"><span id="a10label" class="note"></span><label style="margin:0">速度 <select id="a10speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label></div></div></div>`;
-    if(ps.length)h+=`<div class="analysis-v10-card"><h3>写真記録</h3><div class="note">最も古い：${ps[0].date} ／ 最新：${ps[ps.length-1].date} ／ 合計 ${ps.length}枚</div></div>`;else h+=`<div class="empty">身体写真がまだありません</div>`;
+    if(ps.length)h+=`<div class="analysis-v10-card"><h3>写真記録</h3><div class="note">開始日：${ps[0].date} ／ 最新：${ps[ps.length-1].date} ／ 合計 ${ps.length}枚</div></div>`;else h+=`<div class="empty">身体写真がまだありません</div>`;
     return h;
   }
   function morphPhotos(){return photoRecords(currentUserId).filter(p=>p.orientation===A.orientation&&p.url)}
@@ -2728,6 +2728,7 @@ return h;
   }
   function bodyView(){const ps=typeof photoRecords==='function'?photoRecords(currentUserId):[],dirs=['正面','背面','左側面','右側面'];let h='<div class="analysis-v10-photo-grid">';dirs.forEach(o=>{const a=ps.filter(p=>p.orientation===o);h+=`<div class="analysis-v10-photo-stat"><span>${o}</span><b>${a.length}枚</b><div class="note">最も古い日付：${a.length?a[0].date:'—'}</div></div>`});h+='</div>';h+=`<div class="analysis-v10-card"><h3>身体写真モーフィング</h3><div class="row"><div style="flex:1"><label>方向</label><select id="v13dir">${dirs.map(o=>`<option ${V.dir===o?'selected':''}>${o}</option>`).join('')}</select></div><button id="v13play" type="button">${V.playing?'⏸️ 停止':'▶️ 再生'}</button></div><canvas id="v13morph" style="width:100%;height:300px;display:block;background:#eee;border-radius:10px;margin-top:10px"></canvas><input id="v13seek" type="range" min="0" max="1000" value="${V.pos||0}" style="width:100%"><div class="note" id="v13label"></div><label>速度 <select id="v13speed"><option value="0.25">0.25</option><option value="0.5">0.5</option><option value="1" selected>1</option><option value="2">2</option></select>倍</label></div>`;return h}
   const morphImageCache=new Map();
+  let morphDrawToken=0;
   function morphUrl(p){return p?.url||p?.photoData||p?.dataUrl||p?.src||''}
   function loadMorphImage(url){
     if(!url)return Promise.resolve(null);
@@ -2740,31 +2741,42 @@ return h;
     });
     morphImageCache.set(url,promise);return promise;
   }
+  function morphFit(im,w,h){
+    const iw=im.naturalWidth||im.width||1,ih=im.naturalHeight||im.height||1;
+    const z=Math.min(w/iw,h/ih),dw=iw*z,dh=ih*z;
+    return {dx:(w-dw)/2,dy:(h-dh)/2,dw,dh};
+  }
   async function drawMorph(){
     const c=document.getElementById('v13morph'),lab=document.getElementById('v13label');if(!c)return;
     const ps=(photoRecords?.(currentUserId)||[]).filter(p=>p.orientation===V.dir&&morphUrl(p));
     const r=c.getBoundingClientRect(),w=Math.max(300,Math.round(r.width||320)),h=300,d=window.devicePixelRatio||1;
-    c.width=w*d;c.height=h*d;c.style.background='#fff';
+    if(c._mw!==w||c._mh!==h||c._md!==d){c.width=w*d;c.height=h*d;c._mw=w;c._mh=h;c._md=d;}
+    c.style.background='#fff';
     const ctx=c.getContext('2d');ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
     if(!ps.length){ctx.fillStyle='#777';ctx.textAlign='center';ctx.font='15px sans-serif';ctx.fillText('この方向の写真がありません',w/2,h/2);if(lab)lab.textContent='写真なし';return}
+    const token=++morphDrawToken;
     const idx=Math.min(Math.max(0,Math.floor((V.pos||0)/1000*(ps.length-1))),ps.length-1);
     const next=Math.min(idx+1,ps.length-1);
     const a=ps.length===1?0:((V.pos||0)/1000*(ps.length-1)-idx);
     const [im1,im2]=await Promise.all([loadMorphImage(morphUrl(ps[idx])),loadMorphImage(morphUrl(ps[next]))]);
+    if(token!==morphDrawToken)return;
     if(!im1||!im2){ctx.fillStyle='#777';ctx.textAlign='center';ctx.font='15px sans-serif';ctx.fillText('写真を読み込めませんでした',w/2,h/2);if(lab)lab.textContent='写真読み込みエラー';return}
-    function faceBox(im){
-      // FaceDetectorが使える場合のみ顔を基準にする。未対応端末でも必ず描画する。
-      return null;
-    }
-    const fit=(im)=>{const z=Math.min(w/im.naturalWidth||w/im.width,h/im.naturalHeight||h/im.height);return {z,dw:im.width*z,dh:im.height*z,dx:(w-im.width*z)/2,dy:(h-im.height*z)/2};};
-    // まず全身が確実に見えるcontain配置。写真の縦横比が違っても灰色だけになることを防ぐ。
-    const a1=fit(im1),a2=fit(im2);
+    const a1=morphFit(im1,w,h),a2=morphFit(im2,w,h);
+    ctx.clearRect(0,0,w,h);ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
     ctx.save();ctx.globalAlpha=1-a;ctx.drawImage(im1,a1.dx,a1.dy,a1.dw,a1.dh);ctx.restore();
     if(next!==idx){ctx.save();ctx.globalAlpha=a;ctx.drawImage(im2,a2.dx,a2.dy,a2.dw,a2.dh);ctx.restore();}
     if(lab)lab.textContent=ps.length===1?ps[0].date:`${ps[idx].date} → ${ps[next].date} ${Math.round(a*100)}%`;
   }
   function stop(){V.playing=false;if(V.raf)cancelAnimationFrame(V.raf);V.raf=null;V.last=0;const b=document.getElementById('v13play');if(b)b.textContent='▶️ 再生'}
-  function tick(ts){if(!V.playing)return;const sp=parseFloat(document.getElementById('v13speed')?.value||1);if(!V.last)V.last=ts;V.pos=(V.pos||0)+(ts-V.last)*0.06*sp;V.last=ts;if(V.pos>1000)V.pos=0;const q=document.getElementById('v13seek');if(q)q.value=V.pos;drawMorph();V.raf=requestAnimationFrame(tick)}
+  function tick(ts){
+    if(!V.playing)return;
+    const sp=parseFloat(document.getElementById('v13speed')?.value||1);
+    if(!V.last)V.last=ts;
+    V.pos=(V.pos||0)+(ts-V.last)*0.06*sp;V.last=ts;
+    if(V.pos>1000)V.pos=0;
+    const q=document.getElementById('v13seek');if(q)q.value=V.pos;
+    drawMorph().finally(()=>{if(V.playing)V.raf=requestAnimationFrame(tick)});
+  }
   function renderV13(){const el=document.getElementById('analysis');if(!el)return;stop();let h=`<div class="card"><h2>分析</h2><div class="analysis-v10-tabs"><button type="button" class="analysis-v10-tab ${V.tab==='workout'?'active':''}" data-v13="workout">🏋️ 筋トレ</button><button type="button" class="analysis-v10-tab ${V.tab==='meal'?'active':''}" data-v13="meal">🍚 食事</button><button type="button" class="analysis-v10-tab ${V.tab==='body'?'active':''}" data-v13="body">📸 身体</button></div>${V.tab==='workout'?workoutView():V.tab==='meal'?mealView():bodyView()}</div>`;el.innerHTML=h;el.querySelectorAll('[data-v13]').forEach(b=>b.onclick=()=>{V.tab=b.dataset.v13;renderV13()});if(V.tab==='workout'){el.querySelector('#v13ex')?.addEventListener('change',e=>{V.exercise=e.target.value;drawWork()});el.querySelector('#v13unit')?.addEventListener('change',e=>{V.unit=e.target.value;drawWork()});drawWork()}else if(V.tab==='meal'){requestAnimationFrame(()=>{
       drawLine('mealCalChart',daySeriesForMonth(),[{key:'cal',label:'カロリー'}],' kcal');
       drawLine('mealPfcChart',daySeriesForMonth(),[{key:'p',label:'P'},{key:'f',label:'F'},{key:'c',label:'C'}],' g');
