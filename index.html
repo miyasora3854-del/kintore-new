@@ -846,9 +846,19 @@ function deleteMeal(i){
   saveAll();render();
 }
 function renderHomePhotoPreview(el){
-  const photos=((data[state.date]||{}).photos||[]).filter(p=>(p.userId||currentUserId)===currentUserId);
+  // 身体写真は専用キャッシュ/Firestoreから取得するため、data[日付].photosだけに依存しない。
+  let photos=[];
+  try{
+    photos=photoRecords(currentUserId).filter(p=>p.date===state.date && p.url);
+  }catch(e){
+    photos=((data[state.date]||{}).photos||[]).filter(p=>(p.userId||currentUserId)===currentUserId);
+  }
   if(!photos.length){el.innerHTML=`<div class="empty">この日の身体写真はまだありません</div><div class="note">正面・背面・左側面・右側面を登録できます。体重・体脂肪率も一緒に記録できます。</div>`;return;}
-  let h='';photos.forEach(p=>{h+=`<div class="photo-card"><img src="${esc(p.url)}" style="width:100%;max-height:360px;object-fit:contain;border-radius:10px;background:#f3f3f3"><div class="note" style="margin-top:6px">${esc(p.orientation)}${p.weight?' ・ '+esc(p.weight)+' kg':''}${p.bodyFat?' ・ 体脂肪率 '+esc(p.bodyFat)+'%':''}</div><div style="margin-top:7px"><button type="button" class="sub body-photo-edit-btn" data-photo-edit="${esc(photoRecordKey(p))}">✏️ 編集</button></div></div>`});el.innerHTML=h;
+  let h='';photos.forEach(p=>{
+    const key=photoRecordKey(p);
+    h+=`<div class="photo-card"><img src="${esc(p.url)}" style="width:100%;max-height:360px;object-fit:contain;border-radius:10px;background:#f3f3f3"><div class="note" style="margin-top:6px">${esc(p.orientation||'身体写真')}${p.weight?' ・ '+esc(p.weight)+' kg':''}${p.bodyFat?' ・ 体脂肪率 '+esc(p.bodyFat)+'%':''}</div><div style="margin-top:7px;display:flex;gap:8px"><button type="button" class="sub body-photo-edit-btn" data-photo-edit="${esc(key)}">✏️ 編集</button></div></div>`;
+  });
+  el.innerHTML=h;
 }
 function openPhotoSourceModal(){
   const bg=document.getElementById('modalBg'),m=document.getElementById('modal');
@@ -3220,7 +3230,7 @@ if(S.tab==='workout'){
     let h=`<div class="card"><h2>分析</h2><div class="analysis-v10-tabs"><button type="button" class="analysis-v10-tab" data-mf="workout">🏋️ 運動</button><button type="button" class="analysis-v10-tab" data-mf="meal">🍚 食事</button><button type="button" class="analysis-v10-tab active" data-mf="body">📸 身体</button><button type="button" class="analysis-v10-tab" data-mf="summary">📝 総評</button></div>`;
     h+=`<div class="analysis-v10-photo-grid">${dirs.map((d,i)=>`<div class="analysis-v10-photo-stat"><span>${d}</span><b>${counts[i]}枚</b><div class="note">開始日：${ps.filter(p=>p.orientation===d)[0]?.date||'—'}</div></div>`).join('')}</div>`;
     h+=`<div class="analysis-v10-card"><h3>身体写真モーフィング</h3><div class="note">写真ごとの顔の位置・大きさを基準に、カメラ距離とフレーミングを自動調整します。顔が検出できない写真は元の構図を維持します。</div><div class="row" style="margin-top:10px"><div style="flex:1"><label>方向</label><select id="morph63Dir">${dirs.map(d=>`<option ${M.dir===d?'selected':''}>${d}</option>`).join('')}</select></div><button id="morph63Play" type="button">▶️ 再生</button></div><div style="margin-top:10px;background:#f7f7f8;padding:10px;border-radius:12px"><canvas id="morph63Canvas" style="width:100%;height:300px;display:block;background:#eee;border-radius:10px"></canvas><input id="morph63Seek" type="range" min="0" max="1000" value="${M.pos}" style="width:100%"><div class="row" style="justify-content:space-between"><span id="morph63Label" class="note"></span><label style="margin:0">速度 <select id="morph63Speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="5">5×</option><option value="10">10×</option></select></label></div></div></div>`;
-    h+=ps.length?`<div class="analysis-v10-card"><h3>写真記録</h3><div class="note">最古：${ps[0].date} ／ 最新：${ps[ps.length-1].date} ／ 合計 ${ps.length}枚</div></div>`:`<div class="empty">身体写真がまだありません</div>`;
+    h+=ps.length?`<div class="analysis-v10-card"><h3>写真記録</h3><div class="note">最古：${ps[0].date} ／ 最新：${ps[ps.length-1].date} ／ 合計 ${ps.length}枚</div><div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">${ps.slice().reverse().map(p=>`<div class="row" style="justify-content:space-between;gap:8px"><span>${esc(p.date)} ・ ${esc(p.orientation||'身体写真')}${p.weight?' ・ '+esc(p.weight)+' kg':''}${p.bodyFat?' ・ 体脂肪 '+esc(p.bodyFat)+'%':''}</span><button type="button" class="sub body-photo-edit-btn" data-photo-edit="${esc(photoRecordKey(p))}">✏️ 編集</button></div>`).join('')}</div></div>`:`<div class="empty">身体写真がまだありません</div>`;
     h+='</div>';el.innerHTML=h;
     el.querySelectorAll('[data-mf]').forEach(b=>b.onclick=()=>{
       const t=b.dataset.mf;
